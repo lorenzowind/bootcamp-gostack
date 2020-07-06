@@ -1,95 +1,69 @@
-import React from 'react';
+/* eslint-disable no-unused-vars */
+/* eslint-disable camelcase */
+import React, { useState, FormEvent } from 'react';
 import { FiChevronRight } from 'react-icons/fi';
+
+import api from '../../services/api';
+
 import logoImg from '../../assets/logo.svg';
 
 import { Title, Form, Repositories } from './styles';
 
+interface Repository {
+  full_name: string;
+  description: string;
+  owner: {
+    login: string;
+    avatar_url: string;
+  };
+}
+
 const Dashboard: React.FC = () => {
+  const [newRepo, setNewRepo] = useState('');
+
+  const [repositories, setRepositories] = useState<Repository[]>([]);
+
+  async function handleAddRepository(
+    event: FormEvent<HTMLFormElement>,
+  ): Promise<void> {
+    event.preventDefault();
+
+    const response = await api.get<Repository>(`repos/${newRepo}`);
+
+    const repository = response.data;
+
+    setRepositories([...repositories, repository]);
+    setNewRepo('');
+  }
+
   return (
     <>
       <img src={logoImg} alt="Github Explorer" />
       <Title>Explore repositórios no GitHub</Title>
 
-      <Form>
-        <input placeholder="Digite o nome do repositório" />
-        <button type="button">Pesquisar</button>
+      <Form onSubmit={handleAddRepository}>
+        <input
+          value={newRepo}
+          onChange={e => setNewRepo(e.target.value)}
+          placeholder="Digite o nome do repositório"
+        />
+        <button type="submit">Pesquisar</button>
       </Form>
 
       <Repositories>
-        <a href="test">
-          <img
-            src="https://avatars3.githubusercontent.com/u/48891746?s=460&u=c53ef00e81830ae2549ded78efff6a68c2c97f10&v=4"
-            alt="Lorenzo Windmoller"
-          />
-          <div>
-            <strong>Code Helpers</strong>
-            <p>
-              The Code Helpers is an application to share errors or programming
-              difficulties
-            </p>
-          </div>
-          <FiChevronRight size={20} />
-        </a>
-
-        <a href="test">
-          <img
-            src="https://avatars3.githubusercontent.com/u/48891746?s=460&u=c53ef00e81830ae2549ded78efff6a68c2c97f10&v=4"
-            alt="Lorenzo Windmoller"
-          />
-          <div>
-            <strong>Code Helpers</strong>
-            <p>
-              The Code Helpers is an application to share errors or programming
-              difficulties
-            </p>
-          </div>
-          <FiChevronRight size={20} />
-        </a>
-
-        <a href="test">
-          <img
-            src="https://avatars3.githubusercontent.com/u/48891746?s=460&u=c53ef00e81830ae2549ded78efff6a68c2c97f10&v=4"
-            alt="Lorenzo Windmoller"
-          />
-          <div>
-            <strong>Code Helpers</strong>
-            <p>
-              The Code Helpers is an application to share errors or programming
-              difficulties
-            </p>
-          </div>
-          <FiChevronRight size={20} />
-        </a>
-
-        <a href="test">
-          <img
-            src="https://avatars3.githubusercontent.com/u/48891746?s=460&u=c53ef00e81830ae2549ded78efff6a68c2c97f10&v=4"
-            alt="Lorenzo Windmoller"
-          />
-          <div>
-            <strong>Code Helpers</strong>
-            <p>
-              The Code Helpers is an application to share errors or programming
-              difficulties
-            </p>
-          </div>
-          <FiChevronRight size={20} />
-        </a>
-
-        <a href="test">
-          <img
-            src="https://avatars3.githubusercontent.com/u/48891746?s=460&u=c53ef00e81830ae2549ded78efff6a68c2c97f10&v=4"
-            alt="Lorenzo Windmoller"
-          />
-          <div>
-            <strong>Code Helpers</strong>
-            <p>
-              The Code Helpers is an application to share errors or programming
-              difficulties
-            </p>
-          </div>
-          <FiChevronRight size={20} />
-        </a>
+        {repositories.map(repository => (
+          <a key={repository.full_name} href="test">
+            <img
+              src={repository.owner.avatar_url}
+              alt={repository.owner.login}
+            />
+            <div>
+              <strong>{repository.full_name}</strong>
+              <p>{repository.description}</p>
+            </div>
+            <FiChevronRight size={20} />
+          </a>
+        ))}
       </Repositories>
     </>
   );
