@@ -1,7 +1,7 @@
 import { GetServerSideProps } from 'next';
 import { Title } from '../styles/pages/Home';
 
-interface IProduct {
+export interface IProduct {
   id: string;
   title: string;
 }
@@ -18,7 +18,9 @@ export default function Home({ recommendedProducts }: HomeProps) {
 
         <ul>
           {recommendedProducts.map(recommendedProduct => (
-            <li>{recommendedProduct.title}</li>
+            <li key={recommendedProduct.id}>
+              {recommendedProduct.title}
+            </li>
           ))}
         </ul>
       </section>
